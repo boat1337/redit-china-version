@@ -1,0 +1,141 @@
+<style>
+@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
+*{
+font-family: 'Open Sans', sans-serif;
+font-size: 14px;
+}
+h1{
+font-size: 32px;
+}
+#lg{
+float: right;
+}
+    body {
+        background-color: #36393f;
+        color: #dcddde;
+      }
+	  #up {
+	-moz-box-shadow:inset 0px 34px 0px -15px #b54b3a;
+	-webkit-box-shadow:inset 0px 34px 0px -15px #b54b3a;
+	box-shadow:inset 0px 34px 0px -15px #b54b3a;
+	background-color:#a73f2d;
+	border:1px solid #241d13;
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:11px;
+	font-weight:bold;
+	padding:3px 6px;
+	text-decoration:none;
+	text-shadow:0px -1px 0px #7a2a1d;
+}
+#up {
+	background-color:#b34332;
+}
+#up:active {
+	position:relative;
+	top:1px;
+}
+#down {
+	-moz-box-shadow:inset 0px 34px 0px -15px #4da639;
+	-webkit-box-shadow:inset 0px 34px 0px -15px #4da639;
+	box-shadow:inset 0px 34px 0px -15px #4da639;
+	background-color:#048c41;
+	border:1px solid #241d13;
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:11px;
+	font-weight:bold;
+	padding:3px 6px;
+	text-decoration:none;
+	text-shadow:0px -1px 0px #7a2a1d;
+}
+#down:hover {
+	background-color:#2d8543;
+}
+#down:active {
+	position:relative;
+	top:1px;
+}
+
+</style>
+<h1 style="margin:0px;padding:0px;">Redit chinese edition<button id="lg" onclick="login()">Login</button><button onclick="reg()" id="lg">Register</button>
+</h1>
+<hr>
+<b>NOTIFICATION:</b><br>
+<b>THIS IS A TEST RUN</b><br>
+<b>EVERYTHING WILL BE RESET AFTER THIS TEST</b><br>
+<hr>
+<h3 style="margin: 0px; padding:0px;">Post</h3>
+Remember to login!<br>
+Title: <input id="ttl" value=""><br>
+
+<textarea id="txt" >Hello world!</textarea><br>
+<button onclick="postd()">Post </button><br><br>
+	<script>
+	function reg(){
+	
+	localStorage.username = prompt("what name?")
+	localStorage.password = prompt("what pass? (use a throwaway one)")
+	fetch('/api/v1/users/register?username=' + localStorage.username + '&password=' + localStorage.password)
+	}
+	function login(){
+		localStorage.username = prompt("what name?")
+	localStorage.password = prompt("what pass?")
+	}
+
+		var localDB = null
+		fetch('/api/v1/db')
+		.then(response => response.json())
+		.then(data => {
+		  localDB = data
+		  for(prop in data.posts){
+		 total = data.posts[prop].votes.up - data.posts[prop].votes.down
+		 console.log(total, "total")
+		 console.log(data.posts[prop].votes.up, "up")
+		 console.log(data.posts[prop].votes.down, " down")
+		// textblock.split("\n").slice(1).join("\n")
+		  document.body.innerHTML += '<button style="margin-right: 4px;" id="down" onclick="up(\'' + prop + '\')">⮝</button>'
+		 
+		  document.body.innerHTML += "<b>" + data.posts[prop].author + " </b> "+ data.posts[prop].title + "<br>"
+		  document.body.innerHTML += '<nz style="margin-left:7px;margin-right:14px;">' + total + "</nz>"
+		  
+		  document.body.innerHTML += data.posts[prop].content.split("<br />")[0]+ "<br> </div>"
+		    document.body.innerHTML += '<button id="up" onclick="down(\'' + prop + '\')">⮟</button>'
+			document.body.innerHTML += '<nez style="margin-left:4px;">' +data.posts[prop].content.split("<br />")[1]+ "<br>"
+			document.body.innerHTML += '<nez style="margin-left:28px;box-decoration-break: clone;">' +data.posts[prop].content.split("<br />").slice(2).join("<br />")+ "<br>"
+		 // document.body.innerHTML += '<i>' + total + ' upvotes </i><button onclick="up(\'' + prop + '\')">⮝</button>'
+	//	  document.body.innerHTML += '<button id="up" onclick="down(\'' + prop + '\')">⮟</button><br><br>'
+		  
+		  
+		  // document.body.innerHTML += '<small>Post ID: ' + prop + '<br></small><br>'
+		   
+			
+		  }
+		 
+		})
+	.catch(error => console.error(error))
+function doPost(username,content,ttl){
+content = content.replace(/(?:\r\n|\r|\n)/g, '<br>');
+if(localStorage.password == undefined){
+alert("Please login to post")
+}else{
+fetch("/api/v1/posts/new?username=" + localStorage.username + "&password=" + localStorage.password + "&content=" + content + "&title=" + ttl).then(n=>location.reload())
+}
+}
+
+function up(w){
+fetch("/api/v1/posts/upvote?id=" + w + `&username=${localStorage.username}&password=` + localStorage.password) //.then(n=>location.reload())
+setTimeout(function(){location.reload()},100)
+}
+function down(w){
+fetch("/api/v1/posts/downvote?id=" + w).then(n=>location.reload())
+setTimeout(function(){location.reload()},100)
+}
+function postd(){
+doPost(localStorage.username,document.getElementById("txt").value + "<br>",document.getElementById("ttl").value)
+}
+</script>
