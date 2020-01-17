@@ -27,7 +27,7 @@ var userDB = {
 "upvoted":[]
 }
 }
-app.use('/app', express.static('public'));
+app.use('/', express.static('public'));
 
 function makeid(length) {
    var result           = '';
